@@ -133,7 +133,7 @@ Feel free to upload an image or just start chatting! How can I help you today?`;
       const session = await getProcessingSession(sessionId);
       if (session && session.userId === user.uid) {
         setCurrentSession(session);
-        setUploadedImage(session.originalImageUrl || session.processedImageUrl);
+        setUploadedImage(session.originalImageUrl || session.processedImageUrl || null);
         setImageMode(!!session.originalImageUrl || !!session.processedImageUrl);
         
         // Load chat messages
@@ -490,7 +490,7 @@ Feel free to upload an image or just start chatting! How can I help you today?`;
                   {currentSession ? 'Saved session - continue your conversation' : (imageMode 
                     ? `Analyzing ${processingType === 'super-resolution' ? 'enhanced' : processingType === 'restoration' ? 'restored' : 'uploaded'} image`
                     : 'Powered by Google\'s Gemini AI'
-                  }
+                  )}
                 </p>
               </div>
             </div>
