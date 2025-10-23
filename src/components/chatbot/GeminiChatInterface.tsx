@@ -357,6 +357,7 @@ Feel free to upload an image or just start chatting! How can I help you today?`;
           <div className="glass-effect rounded-lg border border-blue-500/30 mb-6 p-4">
             <div className="flex items-center gap-4">
               <div className="flex-shrink-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={uploadedImage}
                   alt="Uploaded artifact"
@@ -422,6 +423,7 @@ Feel free to upload an image or just start chatting! How can I help you today?`;
                     {/* Image if present */}
                     {message.hasImage && message.imageUrl && (
                       <div className="mb-3">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={message.imageUrl}
                           alt="Uploaded"
@@ -456,6 +458,7 @@ Feel free to upload an image or just start chatting! How can I help you today?`;
           {uploadedImage && (
             <div className="px-6 py-3 border-t border-blue-500/30 bg-blue-500/5">
               <div className="flex items-center gap-3">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={uploadedImage}
                   alt="Uploaded"

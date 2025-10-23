@@ -91,6 +91,7 @@ const SciFiWriterInterface: React.FC<SciFiWriterInterfaceProps> = ({ sessionId }
       // Create new session
       initializeNewSession();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sessionId, user]);
 
   useEffect(() => {
@@ -484,6 +485,7 @@ const SciFiWriterInterface: React.FC<SciFiWriterInterfaceProps> = ({ sessionId }
                 </div>
               ) : (
                 <div className="relative">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={uploadedImage}
                     alt="Uploaded artifact"
