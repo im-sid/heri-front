@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { Paintbrush, Eraser, RotateCcw, Download, Trash2, Check } from 'lucide-react';
 
 interface ROISelectorProps {
@@ -41,16 +41,7 @@ const ROISelector: React.FC<ROISelectorProps> = ({
     img.src = imageUrl;
   }, [imageUrl]);
 
-  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    setIsDrawing(true);
-    draw(e);
-  };
-
-  const stopDrawing = () => {
-    setIsDrawing(false);
-  };
-
-  const draw = (e: React.MouseEvent<HTMLCanvasElement>) => {
+  const draw = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isDrawing && e.type !== 'mousedown') return;
 
     const canvas = canvasRef.current;
@@ -70,9 +61,18 @@ const ROISelector: React.FC<ROISelectorProps> = ({
     ctx.beginPath();
     ctx.arc(x, y, brushSize, 0, Math.PI * 2);
     ctx.fill();
+  }, [isDrawing, mode, brushSize]);
+
+  const startDrawing = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    setIsDrawing(true);
+    draw(e);
   };
 
-  const clearCanvas = () => {
+  const stopDrawing = () => {
+    setIsDrawing(false);
+  };
+
+  const clearCanvas = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -88,7 +88,7 @@ const ROISelector: React.FC<ROISelectorProps> = ({
       ctx.drawImage(img, 0, 0);
     };
     img.src = imageUrl;
-  };
+  }, [imageUrl]);
 
   const generateMask = () => {
     const canvas = canvasRef.current;
