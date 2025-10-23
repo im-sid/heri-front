@@ -194,8 +194,8 @@ const ROISelector: React.FC<ROISelectorProps> = ({
         <button
           onClick={() => setMode('paint')}
           className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${mode === 'paint'
-              ? 'bg-primary/30 border-primary text-white'
-              : 'bg-primary/5 border-primary/30 hover:border-primary'
+            ? 'bg-primary/30 border-primary text-white'
+            : 'bg-primary/5 border-primary/30 hover:border-primary'
             }`}
         >
           <Paintbrush className="w-5 h-5" />
@@ -205,8 +205,8 @@ const ROISelector: React.FC<ROISelectorProps> = ({
         <button
           onClick={() => setMode('erase')}
           className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-all ${mode === 'erase'
-              ? 'bg-secondary/30 border-secondary text-white'
-              : 'bg-secondary/5 border-secondary/30 hover:border-secondary'
+            ? 'bg-secondary/30 border-secondary text-white'
+            : 'bg-secondary/5 border-secondary/30 hover:border-secondary'
             }`}
         >
           <Eraser className="w-5 h-5" />
@@ -287,7 +287,7 @@ const ROISelector: React.FC<ROISelectorProps> = ({
       <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
         <p className="text-xs text-wheat/70">
           <span className="font-bold text-primary">How to use:</span> Paint over the damaged or faded areas you want to restore.
-          The AI will intelligently fill these regions. Use Erase to fix mistakes. Click {'"'}Apply & Restore{'"'} when ready.
+          The AI will intelligently fill these regions. Use Erase to fix mistakes. Click Apply and Restore when ready.
         </p>
       </div>
     </div>
