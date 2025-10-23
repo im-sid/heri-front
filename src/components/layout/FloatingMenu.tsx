@@ -23,6 +23,14 @@ const FloatingMenu = () => {
   const pathname = usePathname();
   const { isOpen, toggleMenu, closeMenu } = useFloatingMenu();
 
+  // Debug logging
+  console.log('FloatingMenu render - isOpen:', isOpen);
+  
+  // Test if component is rendering
+  if (!user) {
+    console.log('No user, FloatingMenu will render but with limited items');
+  }
+
   const menuItems = [
     {
       href: '/',
@@ -87,35 +95,39 @@ const FloatingMenu = () => {
 
   return (
     <>
+      {/* Debug indicator */}
+      <div className="fixed top-4 right-4 z-50 bg-red-500 text-white p-2 text-xs rounded">
+        Menu: {isOpen ? 'OPEN' : 'CLOSED'}
+      </div>
+      
       {/* Floating Menu Button */}
-      <div className="fixed top-20 left-4 z-40">
+      <div className="fixed top-20 left-4 z-50">
         <button
-          onClick={toggleMenu}
+          onClick={() => {
+            console.log('Button clicked, current isOpen:', isOpen);
+            toggleMenu();
+          }}
           className={`
-            floating-menu-button
             w-12 h-12 sm:w-14 sm:h-14 
-            glass-effect 
-            border-2 border-primary/50 
+            bg-dark/80 backdrop-blur-sm
+            border-2 ${isOpen ? 'border-primary bg-primary/20' : 'border-primary/50 hover:border-primary hover:bg-primary/10'}
             rounded-full 
             flex items-center justify-center 
             transition-all duration-300 
-            hover:border-primary 
-            hover:shadow-glow-lg 
+            shadow-lg hover:shadow-xl
             group
-            ${isOpen ? 'bg-primary/20 border-primary menu-item-glow' : 'hover:bg-primary/10 floating-button-hover'}
           `}
           aria-label="Toggle navigation menu"
         >
           {isOpen ? (
-            <X className="w-5 h-5 sm:w-6 sm:h-6 text-primary transition-transform duration-300 rotate-90" />
+            <X className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
           ) : (
-            <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-primary transition-transform duration-300 group-hover:scale-110" />
+            <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
           )}
           
           {/* Notification Badge */}
           {!isOpen && (
             <div className="absolute -top-1 -right-1 w-3 h-3 bg-secondary rounded-full animate-pulse">
-              <div className="absolute inset-0 bg-secondary rounded-full animate-ping"></div>
             </div>
           )}
         </button>
@@ -124,18 +136,17 @@ const FloatingMenu = () => {
       {/* Menu Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 z-30 bg-dark/50 menu-backdrop"
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
           onClick={closeMenu}
         />
       )}
 
       {/* Sliding Menu Panel */}
       <div className={`
-        floating-menu-panel
-        fixed top-0 left-0 h-full w-80 sm:w-96 z-35
-        glass-effect border-r-2 border-primary/30
+        fixed top-0 left-0 h-full w-80 sm:w-96 z-40
+        bg-dark/90 backdrop-blur-lg border-r-2 border-primary/30
         transform transition-transform duration-300 ease-in-out
-        ${isOpen ? 'translate-x-0 floating-menu-enter' : '-translate-x-full floating-menu-exit'}
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         {/* Menu Header */}
         <div className="p-6 border-b border-primary/20">
@@ -169,10 +180,9 @@ const FloatingMenu = () => {
                 href={item.href}
                 onClick={closeMenu}
                 className={`
-                  group flex items-center p-4 rounded-lg 
-                  menu-item-hover
+                  group flex items-center p-4 rounded-lg transition-all duration-300
                   ${active 
-                    ? 'menu-item-active' 
+                    ? 'bg-primary/20 border-2 border-primary/50 shadow-glow' 
                     : 'hover:bg-primary/10 border-2 border-transparent hover:border-primary/30'
                   }
                 `}
