@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Image from 'next/image';
 import { Download, Maximize2, Sparkles } from 'lucide-react';
+import { getImageProps } from '@/utils/imageUtils';
 
 interface ImageComparisonProps {
   originalImage: string;
@@ -65,7 +66,7 @@ const ImageComparison: React.FC<ImageComparisonProps> = ({
             alt="Original artifact"
             fill
             className="object-contain"
-            priority
+            {...getImageProps(originalImage)}
           />
           <div className="absolute bottom-2 left-2 px-3 py-1 bg-dark/80 rounded-full text-xs font-sans border border-gray-600">
             Original
@@ -84,7 +85,7 @@ const ImageComparison: React.FC<ImageComparisonProps> = ({
             alt="Enhanced artifact"
             fill
             className="object-contain"
-            priority
+            {...getImageProps(processedImage)}
           />
           <div className="absolute bottom-2 right-2 px-3 py-1 bg-primary/80 rounded-full text-xs font-sans border border-primary">
             Enhanced

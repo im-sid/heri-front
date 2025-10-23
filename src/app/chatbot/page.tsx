@@ -267,6 +267,12 @@ const ChatbotPageContent = () => {
       toast.success('Super-Resolution complete!', { id: toastId });
       setProcessedImageUrl(result.processedImageUrl);
       
+      // Log image source for debugging
+      console.log('✅ Processed image URL:', result.processedImageUrl);
+      const imageSource = result.processedImageUrl.includes('imgur.com') ? 'Imgur' : 
+                         result.processedImageUrl.includes('postimages.org') ? 'Postimages' : 'Local';
+      console.log('📸 Image hosted on:', imageSource);
+      
       // Show save notification
       setTimeout(() => {
         toast.success('💾 You can now save this session to your gallery!', {
@@ -324,6 +330,12 @@ const ChatbotPageContent = () => {
       toast.success('Restoration complete!', { id: toastId });
       setProcessedImageUrl(result.processedImageUrl);
       
+      // Log image source for debugging
+      console.log('✅ Processed image URL:', result.processedImageUrl);
+      const imageSource = result.processedImageUrl.includes('imgur.com') ? 'Imgur' : 
+                         result.processedImageUrl.includes('postimages.org') ? 'Postimages' : 'Local';
+      console.log('📸 Image hosted on:', imageSource);
+      
       // Show save notification
       setTimeout(() => {
         toast.success('💾 You can now save this session to your gallery!', {
@@ -348,16 +360,42 @@ const ChatbotPageContent = () => {
     }
   };
 
-  const handleDownload = () => {
+  const handleDownload = async () => {
     if (!processedImageUrl) return;
     
-    const link = document.createElement('a');
-    link.href = processedImageUrl;
-    link.download = `heri-science-enhanced-${Date.now()}.jpg`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    toast.success('Download started!');
+    const toastId = toast.loading('Preparing download...');
+    
+    try {
+      // For external URLs (Imgur, Postimages), we need to fetch and download
+      if (processedImageUrl.includes('imgur.com') || processedImageUrl.includes('postimages.org')) {
+        const response = await fetch(processedImageUrl);
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `heri-science-enhanced-${Date.now()}.jpg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Clean up the blob URL
+        window.URL.revokeObjectURL(url);
+      } else {
+        // For local URLs or blob URLs, direct download
+        const link = document.createElement('a');
+        link.href = processedImageUrl;
+        link.download = `heri-science-enhanced-${Date.now()}.jpg`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      
+      toast.success('Download started!', { id: toastId });
+    } catch (error) {
+      console.error('Download error:', error);
+      toast.error('Download failed. You can right-click the image to save it.', { id: toastId });
+    }
   };
 
   const convertImageToBase64 = async (imageUrl: string): Promise<string | null> => {
@@ -420,9 +458,15 @@ const ChatbotPageContent = () => {
         console.log('Using Gemini for image analysis...');
         apiEndpoint = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/gemini-chat`;
         
-        // Use the processed image URL directly (no base64 conversion needed)
+        // Use the processed image URL directly - works with Imgur, Postimages, and local URLs
         let imageUrlForAnalysis = processedImageUrl;
-        console.log('Using processed image URL directly for Gemini analysis');
+        
+        // If it's a local URL, convert to full URL
+        if (imageUrlForAnalysis.startsWith('/uploads/')) {
+          imageUrlForAnalysis = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${imageUrlForAnalysis}`;
+        }
+        
+        console.log('Using processed image URL for Gemini analysis:', imageUrlForAnalysis);
 
         requestBody = {
           message: userMsg,
@@ -432,7 +476,9 @@ const ChatbotPageContent = () => {
             imageMode: true,
             processingType: currentSession?.processingType || 'super-resolution',
             sessionName: currentSession?.name || 'AI Lab Session',
-            previousMessages: messages.slice(-5)
+            previousMessages: messages.slice(-5),
+            imageSource: processedImageUrl.includes('imgur.com') ? 'imgur' : 
+                        processedImageUrl.includes('postimages.org') ? 'postimages' : 'local'
           }
         };
       }

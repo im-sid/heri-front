@@ -45,10 +45,27 @@ export const useImageProcessing = () => {
 
       console.log(`[API] ✅ Response received!`);
       console.log(`[API] Status: ${response.data.status}`);
+      console.log(`[API] Processed Image URL: ${response.data.processedImageUrl}`);
       console.log(`[API] Processing time: ${response.data.metadata?.processing_time}`);
       
+      // Validate that we received a proper image URL
+      if (!response.data.processedImageUrl) {
+        throw new Error('No processed image URL received from server');
+      }
+
+      // Check if the URL is accessible (for external hosting services)
+      const imageUrl = response.data.processedImageUrl;
+      console.log(`[API] Image hosted at: ${imageUrl}`);
+      
+      // Return the complete response data
+      const result: ProcessingResult = {
+        processedImageUrl: imageUrl,
+        message: response.data.message || 'Image processed successfully',
+        metadata: response.data.metadata
+      };
+      
       setLoading(false);
-      return response.data;
+      return result;
     } catch (err: any) {
       console.error(`[API] ❌ Error:`, err);
       
