@@ -267,12 +267,6 @@ const ChatbotPageContent = () => {
       toast.success('Super-Resolution complete!', { id: toastId });
       setProcessedImageUrl(result.processedImageUrl);
       
-      // Log image source for debugging
-      console.log('✅ Processed image URL:', result.processedImageUrl);
-      const imageSource = result.processedImageUrl.includes('imgur.com') ? 'Imgur' : 
-                         result.processedImageUrl.includes('postimages.org') ? 'Postimages' : 'Local';
-      console.log('📸 Image hosted on:', imageSource);
-      
       // Show save notification
       setTimeout(() => {
         toast.success('💾 You can now save this session to your gallery!', {
@@ -329,12 +323,6 @@ const ChatbotPageContent = () => {
     if (result) {
       toast.success('Restoration complete!', { id: toastId });
       setProcessedImageUrl(result.processedImageUrl);
-      
-      // Log image source for debugging
-      console.log('✅ Processed image URL:', result.processedImageUrl);
-      const imageSource = result.processedImageUrl.includes('imgur.com') ? 'Imgur' : 
-                         result.processedImageUrl.includes('postimages.org') ? 'Postimages' : 'Local';
-      console.log('📸 Image hosted on:', imageSource);
       
       // Show save notification
       setTimeout(() => {

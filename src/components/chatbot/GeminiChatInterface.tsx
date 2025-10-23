@@ -50,15 +50,7 @@ const GeminiChatInterface: React.FC<GeminiChatInterfaceProps> = ({
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Debug logging
-  useEffect(() => {
-    console.log('GeminiChatInterface props:', {
-      imageUrl: propImageUrl,
-      processingType,
-      sessionName,
-      imageMode: !!propImageUrl
-    });
-  }, [propImageUrl, processingType, sessionName]);
+
 
   useEffect(() => {
     scrollToBottom();

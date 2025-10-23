@@ -23,13 +23,7 @@ const FloatingMenu = () => {
   const pathname = usePathname();
   const { isOpen, toggleMenu, closeMenu } = useFloatingMenu();
 
-  // Debug logging
-  console.log('FloatingMenu render - isOpen:', isOpen);
-  
-  // Test if component is rendering
-  if (!user) {
-    console.log('No user, FloatingMenu will render but with limited items');
-  }
+
 
   const menuItems = [
     {
@@ -95,18 +89,10 @@ const FloatingMenu = () => {
 
   return (
     <>
-      {/* Debug indicator */}
-      <div className="fixed top-4 right-4 z-50 bg-red-500 text-white p-2 text-xs rounded">
-        Menu: {isOpen ? 'OPEN' : 'CLOSED'}
-      </div>
-      
       {/* Floating Menu Button */}
       <div className="fixed top-20 left-4 z-50">
         <button
-          onClick={() => {
-            console.log('Button clicked, current isOpen:', isOpen);
-            toggleMenu();
-          }}
+          onClick={toggleMenu}
           className={`
             w-12 h-12 sm:w-14 sm:h-14 
             bg-dark/80 backdrop-blur-sm
