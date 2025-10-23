@@ -266,12 +266,7 @@ const ROISelector: React.FC<ROISelectorProps> = ({
         </button>
       </div>
 
-      <div className="p-4 bg-primary/5 rounded-lg border border-primary/20">
-        <p className="text-xs text-wheat/70">
-          <span className="font-bold text-primary">How to use:</span> Paint over the damaged or faded areas you want to restore.
-          The AI will intelligently fill these regions. Use Erase to fix mistakes. Click the button when ready.
-        </p>
-      </div>
+
     </div>
   );
 };

@@ -84,6 +84,7 @@ const SciFiWriterInterface: React.FC<SciFiWriterInterfaceProps> = ({ sessionId }
     });
   };
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (sessionId) {
       loadSession();
