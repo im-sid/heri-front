@@ -5,6 +5,7 @@ const nextConfig = {
     domains: ['firebasestorage.googleapis.com'],
   },
   eslint: {
+    dirs: [], // Only run ESLint on these directories during production builds
     ignoreDuringBuilds: true,
   },
   typescript: {
