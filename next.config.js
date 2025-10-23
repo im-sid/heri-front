@@ -2,7 +2,11 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: ['firebasestorage.googleapis.com'],
+    domains: [
+      'firebasestorage.googleapis.com',
+      'tree-photo-module.onrender.com',
+      'your-project.supabase.co'
+    ],
   },
   eslint: {
     dirs: [], // Only run ESLint on these directories during production builds
