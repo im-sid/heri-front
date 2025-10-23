@@ -26,7 +26,7 @@ const AboutSection = () => {
               technology.
             </p>
             <p className="text-lg text-gray-300 mb-8 leading-relaxed">
-              Whether you&apos;re an archaeologist uncovering hidden treasures, a museum curator
+              Whether you{`'`}re an archaeologist uncovering hidden treasures, a museum curator
               preserving cultural heritage, or a sci-fi writer seeking inspiration from
               history, Heri-Science provides the tools you need to unlock the secrets of
               the past.
