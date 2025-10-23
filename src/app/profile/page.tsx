@@ -6,7 +6,7 @@ import { getUserArtifacts } from '@/lib/firestore';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { User, Mail, Shield, Calendar, Image as ImageIcon, Loader } from 'lucide-react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+import SafeImage from '../../components/common/SafeImage';
 
 const ProfilePageContent = () => {
   const { user, userProfile } = useAuth();
@@ -171,7 +171,7 @@ const ProfilePageContent = () => {
                     className="glass-effect p-4 rounded-lg border border-primary/30 group hover:border-primary/50 transition-all"
                   >
                     <div className="relative w-full h-40 rounded-lg overflow-hidden mb-3">
-                      <Image
+                      <SafeImage
                         src={artifact.processedImageUrl || artifact.imageUrl}
                         alt={artifact.name || 'Artifact'}
                         fill

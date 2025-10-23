@@ -2,12 +2,27 @@
 const nextConfig = {
   reactStrictMode: true,
   images: {
-    domains: [
-      'firebasestorage.googleapis.com',
-      'tree-photo-module.onrender.com',
-      'your-project.supabase.co',
-      'i.ibb.co',
-      'ibb.co'
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'tree-photo-module.onrender.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '**.supabase.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.ibb.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'ibb.co',
+      }
     ],
   },
   eslint: {

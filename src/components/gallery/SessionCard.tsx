@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import Image from 'next/image';
+import SafeImage from '../common/SafeImage';
 import { Play, Sparkles, Zap, RefreshCw, BookOpen, Trash2, Download } from 'lucide-react';
 
 interface SessionCardProps {
@@ -48,7 +48,7 @@ const SessionCard: React.FC<SessionCardProps> = ({
       <div className="glass-effect rounded-lg border-2 border-primary/30 overflow-hidden group hover:border-primary transition-all duration-300 saffron-glow h-full flex flex-col">
         {/* Image */}
         <div className="relative cursor-pointer aspect-square sm:aspect-[4/3]" onClick={() => onSessionClick(session)}>
-          <Image
+          <SafeImage
             src={getSessionImage(session)}
             alt={getSessionName(session)}
             fill

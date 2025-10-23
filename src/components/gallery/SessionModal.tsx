@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
+import SafeImage from '../common/SafeImage';
 import { X, Download, Sparkles } from 'lucide-react';
 
 interface SessionModalProps {
@@ -63,7 +63,7 @@ const SessionModal: React.FC<SessionModalProps> = ({
 
             <div className="glass-effect rounded-lg border-2 border-primary p-3 sm:p-6">
               <div className="relative aspect-video mb-4 rounded-lg overflow-hidden">
-                <Image
+                <SafeImage
                   src={getSessionImage(session)}
                   alt={getSessionName(session)}
                   fill
