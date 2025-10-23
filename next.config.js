@@ -5,7 +5,9 @@ const nextConfig = {
     domains: [
       'firebasestorage.googleapis.com',
       'tree-photo-module.onrender.com',
-      'your-project.supabase.co'
+      'your-project.supabase.co',
+      'i.ibb.co',
+      'ibb.co'
     ],
   },
   eslint: {
