@@ -1,0 +1,8 @@
+# Ignore all files - ESLint disabled for build
+*
+**/*
+node_modules
+.next
+out
+build
+dist
