@@ -11,6 +11,7 @@ import {
   SciFiMessage 
 } from '@/lib/scifiFirestore';
 import { uploadImage } from '@/lib/storage';
+import { API_ENDPOINTS } from '@/lib/api';
 import { 
   Upload, 
   Send, 
@@ -197,7 +198,7 @@ const SciFiWriterInterface: React.FC<SciFiWriterInterfaceProps> = ({ sessionId }
 
       // Generate story idea using AI with genre and customization
       const genresText = selectedGenres.map(g => genres.find(genre => genre.value === g)?.label).join(', ');
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/scifi-story-generate`, {
+      const response = await fetch(API_ENDPOINTS.scifiStoryGenerate, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -259,7 +260,7 @@ const SciFiWriterInterface: React.FC<SciFiWriterInterfaceProps> = ({ sessionId }
       }
 
       // Get AI response
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/scifi-chat`, {
+      const response = await fetch(API_ENDPOINTS.scifiChat, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

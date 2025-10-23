@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSearchParams } from 'next/navigation';
+import { API_ENDPOINTS } from '@/lib/api';
 import { 
   Send, 
   Upload, 
@@ -204,7 +205,7 @@ Feel free to upload an image or just start chatting! How can I help you today?`;
 
       console.log('Sending to Gemini API:', requestBody);
 
-      const response = await fetch('/api/gemini-chat', {
+      const response = await fetch(API_ENDPOINTS.geminiChat, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

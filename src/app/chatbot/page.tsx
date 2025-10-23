@@ -4,6 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useImageProcessing } from '@/hooks/useImageProcessing';
 import { useSearchParams } from 'next/navigation';
+import { API_ENDPOINTS } from '@/lib/api';
 import { 
   createProcessingSession, 
   getProcessingSession, 
@@ -192,7 +193,7 @@ const ChatbotPageContent = () => {
       reader.onloadend = async () => {
         const base64data = reader.result;
         
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/auto-analyze`, {
+        const response = await fetch(API_ENDPOINTS.autoAnalyze, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ image: base64data })
@@ -431,7 +432,7 @@ const ChatbotPageContent = () => {
     }
 
     try {
-      let apiEndpoint = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/historical-info`;
+      let apiEndpoint = API_ENDPOINTS.historicalInfo;
       let requestBody: any = {
         query: userMsg,
         artifact_type: 'artifact',
@@ -444,14 +445,15 @@ const ChatbotPageContent = () => {
       // If we have a processed image, use Gemini for visual analysis
       if (processedImageUrl) {
         console.log('Using Gemini for image analysis...');
-        apiEndpoint = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/gemini-chat`;
+        apiEndpoint = API_ENDPOINTS.geminiChat;
         
         // Use the processed image URL directly - works with Imgur, Postimages, and local URLs
         let imageUrlForAnalysis = processedImageUrl;
         
         // If it's a local URL, convert to full URL
         if (imageUrlForAnalysis.startsWith('/uploads/')) {
-          imageUrlForAnalysis = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}${imageUrlForAnalysis}`;
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+          imageUrlForAnalysis = `${apiUrl}${imageUrlForAnalysis}`;
         }
         
         console.log('Using processed image URL for Gemini analysis:', imageUrlForAnalysis);
