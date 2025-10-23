@@ -5,6 +5,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSearchParams } from 'next/navigation';
 import { API_ENDPOINTS } from '@/lib/api';
 import { 
+  createProcessingSession, 
+  getProcessingSession, 
+  updateProcessingSession,
+  addMessageToProcessingSession,
+  ProcessingSession 
+} from '@/lib/firestore';
+import { uploadImage } from '@/lib/storage';
+import { useGalleryRefresh } from '@/hooks/useGalleryRefresh';
+import { 
   Send, 
   Upload, 
   Sparkles, 
@@ -15,7 +24,8 @@ import {
   RefreshCw,
   Download,
   Copy,
-  ArrowLeft
+  ArrowLeft,
+  Save
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
@@ -42,16 +52,29 @@ const GeminiChatInterface: React.FC<GeminiChatInterfaceProps> = ({
 }) => {
   const { user } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const sessionId = searchParams.get('sessionId');
+  const { triggerRefresh } = useGalleryRefresh();
+  
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [uploadedImage, setUploadedImage] = useState<string | null>(propImageUrl || null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageMode, setImageMode] = useState<boolean>(!!propImageUrl);
+  const [currentSession, setCurrentSession] = useState<ProcessingSession | null>(null);
+  const [sessionLoading, setSessionLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
 
+
+  // Load existing session if sessionId is provided
+  useEffect(() => {
+    if (sessionId && user) {
+      loadSession();
+    }
+  }, [sessionId, user]);
 
   useEffect(() => {
     scrollToBottom();
@@ -101,6 +124,139 @@ Feel free to upload an image or just start chatting! How can I help you today?`;
       setMessages([welcomeMessage]);
     }
   }, [imageMode, uploadedImage, processingType, sessionName]);
+
+  const loadSession = async () => {
+    if (!sessionId || !user) return;
+    
+    setSessionLoading(true);
+    try {
+      const session = await getProcessingSession(sessionId);
+      if (session && session.userId === user.uid) {
+        setCurrentSession(session);
+        setUploadedImage(session.originalImageUrl || session.processedImageUrl);
+        setImageMode(!!session.originalImageUrl || !!session.processedImageUrl);
+        
+        // Load chat messages
+        if (session.chatMessages && session.chatMessages.length > 0) {
+          const chatMessages = session.chatMessages.map(msg => ({
+            id: msg.id || `msg-${Date.now()}-${Math.random()}`,
+            role: msg.role,
+            content: msg.content,
+            timestamp: msg.createdAt?.toDate() || new Date(),
+            hasImage: !!msg.imageUrl,
+            imageUrl: msg.imageUrl
+          }));
+          setMessages([
+            {
+              id: 'session-loaded',
+              role: 'assistant',
+              content: `✅ Session "${session.name}" loaded! Continue your conversation.`,
+              timestamp: new Date()
+            },
+            ...chatMessages
+          ]);
+        } else {
+          // No chat messages, just show welcome message
+          setMessages([
+            {
+              id: 'session-loaded',
+              role: 'assistant',
+              content: `✅ Session "${session.name}" loaded! ${session.originalImageUrl || session.processedImageUrl ? 'Your image is ready for analysis.' : 'Start chatting!'}`,
+              timestamp: new Date()
+            }
+          ]);
+        }
+        
+        toast.success(`Session "${session.name}" loaded!`);
+      } else {
+        toast.error('Session not found or access denied');
+      }
+    } catch (error) {
+      console.error('Error loading session:', error);
+      toast.error('Failed to load session');
+    } finally {
+      setSessionLoading(false);
+    }
+  };
+
+  const saveSession = async () => {
+    if (!user) {
+      toast.error('Please login to save sessions');
+      return;
+    }
+
+    if (messages.length <= 1) {
+      toast.error('Start a conversation before saving');
+      return;
+    }
+
+    const sessionName = prompt('Enter a name for this session:', currentSession?.name || 'Gemini Chat Session');
+    if (!sessionName) return;
+
+    const toastId = toast.loading('Saving session...');
+    
+    try {
+      let imageUrl = uploadedImage;
+
+      // Upload image to storage if it's a blob URL or file
+      if (imageFile && uploadedImage?.startsWith('blob:')) {
+        imageUrl = await uploadImage(imageFile, user.uid, 'gemini-sessions');
+      }
+
+      // Convert messages to the correct format (skip welcome messages)
+      const chatMessages = messages
+        .filter(msg => !['welcome', 'session-loaded'].includes(msg.id))
+        .map(msg => ({
+          userId: user.uid,
+          role: msg.role as 'user' | 'assistant',
+          content: msg.content,
+          imageUrl: msg.imageUrl,
+          createdAt: new Date() as any
+        }));
+
+      if (currentSession?.id) {
+        // Update existing session
+        await updateProcessingSession(currentSession.id, {
+          name: sessionName,
+          originalImageUrl: imageUrl || undefined,
+          processedImageUrl: imageUrl || undefined,
+          chatMessages: chatMessages,
+          isActive: true,
+          updatedAt: new Date() as any
+        });
+        
+        setCurrentSession(prev => prev ? { ...prev, name: sessionName } : null);
+        toast.success('Session updated!', { id: toastId });
+        triggerRefresh(); // Notify gallery to refresh
+      } else {
+        // Create new session
+        const sessionData = {
+          userId: user.uid,
+          name: sessionName,
+          description: `Gemini Chat session - ${chatMessages.length} messages`,
+          originalImageUrl: imageUrl || '',
+          processedImageUrl: imageUrl || undefined,
+          processingType: processingType || undefined,
+          chatMessages: chatMessages,
+          tags: ['gemini-chat', 'ai-conversation', ...(imageMode ? ['image-analysis'] : [])],
+          isActive: true
+        };
+
+        const newSessionId = await createProcessingSession(sessionData);
+        setCurrentSession({ ...sessionData, id: newSessionId } as ProcessingSession);
+        
+        // Update URL to include session ID
+        const newUrl = `/gemini-chat?sessionId=${newSessionId}`;
+        window.history.replaceState({}, '', newUrl);
+        
+        toast.success('Session saved!', { id: toastId });
+        triggerRefresh(); // Notify gallery to refresh
+      }
+    } catch (error) {
+      console.error('Error saving session:', error);
+      toast.error('Failed to save session', { id: toastId });
+    }
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -227,6 +383,28 @@ Feel free to upload an image or just start chatting! How can I help you today?`;
       };
 
       setMessages(prev => [...prev, aiMessage]);
+
+      // Save messages to session if it exists
+      if (currentSession?.id && user) {
+        try {
+          // Save user message
+          await addMessageToProcessingSession(currentSession.id, {
+            userId: user.uid,
+            role: 'user',
+            content: userMessage.content,
+            imageUrl: userMessage.imageUrl
+          });
+          
+          // Save AI response
+          await addMessageToProcessingSession(currentSession.id, {
+            userId: user.uid,
+            role: 'assistant',
+            content: aiMessage.content
+          });
+        } catch (error) {
+          console.error('Error saving messages to session:', error);
+        }
+      }
       
     } catch (error) {
       console.error('Error sending message:', error);
@@ -306,10 +484,10 @@ Feel free to upload an image or just start chatting! How can I help you today?`;
               </div>
               <div>
                 <h1 className="font-decorative text-3xl font-bold text-glow">
-                  {imageMode ? 'Image Analysis - Gemini AI' : 'Gemini AI Chat'}
+                  {currentSession ? currentSession.name : (imageMode ? 'Image Analysis - Gemini AI' : 'Gemini AI Chat')}
                 </h1>
                 <p className="text-wheat/70">
-                  {imageMode 
+                  {currentSession ? 'Saved session - continue your conversation' : (imageMode 
                     ? `Analyzing ${processingType === 'super-resolution' ? 'enhanced' : processingType === 'restoration' ? 'restored' : 'uploaded'} image`
                     : 'Powered by Google\'s Gemini AI'
                   }
@@ -318,6 +496,20 @@ Feel free to upload an image or just start chatting! How can I help you today?`;
             </div>
             
             <div className="flex items-center gap-2">
+              {user && (
+                <button
+                  onClick={saveSession}
+                  disabled={sessionLoading || messages.length <= 1}
+                  className="px-4 py-2 bg-primary hover:bg-primary-dark rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
+                >
+                  {sessionLoading ? (
+                    <Loader className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Save className="w-4 h-4" />
+                  )}
+                  {currentSession ? 'Update' : 'Save'}
+                </button>
+              )}
               <button
                 onClick={exportChat}
                 className="px-4 py-2 bg-green-600 hover:bg-green-700 rounded-lg transition-colors flex items-center gap-2"
