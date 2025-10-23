@@ -179,6 +179,17 @@ Feel free to upload an image or just start chatting! How can I help you today?`;
     }
   };
 
+  // Helper function to remove undefined values from objects
+  const cleanUndefinedValues = (obj: any): any => {
+    const cleaned: any = {};
+    Object.keys(obj).forEach(key => {
+      if (obj[key] !== undefined) {
+        cleaned[key] = obj[key];
+      }
+    });
+    return cleaned;
+  };
+
   const saveSession = async () => {
     if (!user) {
       toast.error('Please login to save sessions');
@@ -210,37 +221,40 @@ Feel free to upload an image or just start chatting! How can I help you today?`;
           userId: user.uid,
           role: msg.role as 'user' | 'assistant',
           content: msg.content,
-          imageUrl: msg.imageUrl,
+          imageUrl: msg.imageUrl || undefined,
           createdAt: new Date() as any
-        }));
+        }))
+        .map(msg => cleanUndefinedValues(msg)); // Clean undefined values
 
       if (currentSession?.id) {
         // Update existing session
-        await updateProcessingSession(currentSession.id, {
+        const updateData = cleanUndefinedValues({
           name: sessionName,
-          originalImageUrl: imageUrl || undefined,
-          processedImageUrl: imageUrl || undefined,
+          originalImageUrl: imageUrl,
+          processedImageUrl: imageUrl,
           chatMessages: chatMessages,
           isActive: true,
           updatedAt: new Date() as any
         });
+
+        await updateProcessingSession(currentSession.id, updateData);
         
         setCurrentSession(prev => prev ? { ...prev, name: sessionName } : null);
         toast.success('Session updated!', { id: toastId });
         triggerRefresh(); // Notify gallery to refresh
       } else {
         // Create new session
-        const sessionData = {
+        const sessionData = cleanUndefinedValues({
           userId: user.uid,
           name: sessionName,
           description: `Gemini Chat session - ${chatMessages.length} messages`,
           originalImageUrl: imageUrl || '',
-          processedImageUrl: imageUrl || undefined,
-          processingType: processingType || undefined,
+          processedImageUrl: imageUrl,
+          processingType: processingType,
           chatMessages: chatMessages,
           tags: ['gemini-chat', 'ai-conversation', ...(imageMode ? ['image-analysis'] : [])],
           isActive: true
-        };
+        });
 
         const newSessionId = await createProcessingSession(sessionData);
         setCurrentSession({ ...sessionData, id: newSessionId } as ProcessingSession);
