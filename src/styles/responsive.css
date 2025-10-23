@@ -357,6 +357,112 @@
   }
 }
 
+/* Floating Menu Animations */
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideOutLeft {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(var(--primary-rgb), 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(var(--primary-rgb), 0.8);
+  }
+}
+
+.floating-menu-enter {
+  animation: slideInLeft 0.3s ease-out;
+}
+
+.floating-menu-exit {
+  animation: slideOutLeft 0.3s ease-in;
+}
+
+.floating-button-hover {
+  animation: float 2s ease-in-out infinite;
+}
+
+.menu-item-glow:hover {
+  animation: pulse-glow 1.5s ease-in-out infinite;
+}
+
+/* Floating Menu Responsive Adjustments */
+@media (max-width: 639px) {
+  .floating-menu-panel {
+    width: calc(100vw - 2rem);
+    max-width: 320px;
+  }
+  
+  .floating-menu-button {
+    width: 48px;
+    height: 48px;
+    top: 72px;
+    left: 12px;
+  }
+}
+
+@media (min-width: 640px) {
+  .floating-menu-panel {
+    width: 384px;
+  }
+  
+  .floating-menu-button {
+    width: 56px;
+    height: 56px;
+    top: 80px;
+    left: 16px;
+  }
+}
+
+/* Menu Item Hover Effects */
+.menu-item-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menu-item-hover:hover {
+  transform: translateX(4px);
+}
+
+.menu-item-active {
+  background: linear-gradient(135deg, rgba(var(--primary-rgb), 0.2), rgba(var(--primary-rgb), 0.1));
+  border-color: rgba(var(--primary-rgb), 0.5);
+  box-shadow: 0 4px 12px rgba(var(--primary-rgb), 0.3);
+}
+
+/* Backdrop Blur Effect */
+.menu-backdrop {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
 /* Utility classes for responsive design */
 .text-responsive-xs {
   font-size: 0.75rem;

@@ -4,6 +4,7 @@ import './globals.css';
 import { AuthProvider } from '@/contexts/AuthContext';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import FloatingMenu from '@/components/layout/FloatingMenu';
 import { Toaster } from '@/components/Toaster';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -25,6 +26,7 @@ export default function RootLayout({
         <AuthProvider>
           <Toaster />
           <Header />
+          <FloatingMenu />
           <main className="flex-grow pt-16">
             {children}
           </main>
