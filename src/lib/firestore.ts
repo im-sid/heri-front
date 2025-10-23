@@ -169,9 +169,24 @@ const PROCESSING_SESSIONS_COLLECTION = 'processingSessions';
 
 export const createProcessingSession = async (sessionData: Omit<ProcessingSession, 'id' | 'createdAt' | 'updatedAt'>): Promise<string> => {
   try {
+    // Validate image URLs to prevent Firestore size limit errors
+    const validateImageUrl = (url: string | undefined, fieldName: string) => {
+      if (url && url.startsWith('data:') && url.length > 1000000) { // 1MB limit
+        console.warn(`${fieldName} is too large (${Math.round(url.length/1024)}KB), removing to prevent Firestore error`);
+        return undefined;
+      }
+      return url;
+    };
+
+    const validatedData = {
+      ...sessionData,
+      originalImageUrl: validateImageUrl(sessionData.originalImageUrl, 'originalImageUrl') || sessionData.originalImageUrl,
+      processedImageUrl: validateImageUrl(sessionData.processedImageUrl, 'processedImageUrl')
+    };
+
     const now = Timestamp.now();
     const docRef = await addDoc(collection(db, PROCESSING_SESSIONS_COLLECTION), {
-      ...sessionData,
+      ...validatedData,
       createdAt: now,
       updatedAt: now
     });
@@ -247,9 +262,26 @@ export const getProcessingSession = async (sessionId: string): Promise<Processin
 
 export const updateProcessingSession = async (sessionId: string, updates: Partial<ProcessingSession>): Promise<void> => {
   try {
+    // Validate image URLs to prevent Firestore size limit errors
+    const validateImageUrl = (url: string | undefined, fieldName: string) => {
+      if (url && url.startsWith('data:') && url.length > 1000000) { // 1MB limit
+        console.warn(`${fieldName} is too large (${Math.round(url.length/1024)}KB), removing to prevent Firestore error`);
+        return undefined;
+      }
+      return url;
+    };
+
+    const validatedUpdates = { ...updates };
+    if (validatedUpdates.processedImageUrl) {
+      validatedUpdates.processedImageUrl = validateImageUrl(validatedUpdates.processedImageUrl, 'processedImageUrl');
+    }
+    if (validatedUpdates.originalImageUrl) {
+      validatedUpdates.originalImageUrl = validateImageUrl(validatedUpdates.originalImageUrl, 'originalImageUrl');
+    }
+
     const docRef = doc(db, PROCESSING_SESSIONS_COLLECTION, sessionId);
     await updateDoc(docRef, {
-      ...updates,
+      ...validatedUpdates,
       updatedAt: Timestamp.now()
     });
   } catch (error) {

@@ -194,18 +194,9 @@ Feel free to upload an image or just start chatting! How can I help you today?`;
     setIsLoading(true);
 
     try {
-      // Convert image to base64 if needed
+      // Use the image URL directly (no base64 conversion needed)
       let imageUrlForAnalysis = uploadedImage;
-      if (uploadedImage && !uploadedImage.startsWith('data:')) {
-        console.log('Converting image to base64 for Gemini analysis...');
-        const base64Image = await convertImageToBase64(uploadedImage);
-        if (base64Image) {
-          imageUrlForAnalysis = base64Image;
-          console.log('Successfully converted image to base64');
-        } else {
-          console.warn('Failed to convert image to base64, using original URL');
-        }
-      }
+      console.log('Using image URL directly for Gemini analysis');
 
       const requestBody = {
         message: inputMessage.trim(),

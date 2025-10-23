@@ -420,16 +420,9 @@ const ChatbotPageContent = () => {
         console.log('Using Gemini for image analysis...');
         apiEndpoint = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000'}/api/gemini-chat`;
         
-        // Convert image to base64 for Gemini
+        // Use the processed image URL directly (no base64 conversion needed)
         let imageUrlForAnalysis = processedImageUrl;
-        if (!processedImageUrl.startsWith('data:')) {
-          console.log('Converting processed image to base64...');
-          const base64Image = await convertImageToBase64(processedImageUrl);
-          if (base64Image) {
-            imageUrlForAnalysis = base64Image;
-            console.log('Successfully converted image to base64');
-          }
-        }
+        console.log('Using processed image URL directly for Gemini analysis');
 
         requestBody = {
           message: userMsg,
