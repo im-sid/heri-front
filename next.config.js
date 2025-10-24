@@ -22,6 +22,22 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'ibb.co',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.imgur.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'imgur.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'postimages.org',
+      },
+      {
+        protocol: 'https',
+        hostname: 'i.postimg.cc',
       }
     ],
   },

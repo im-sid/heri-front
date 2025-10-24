@@ -52,7 +52,9 @@ export const getImageProps = (url: string) => {
   const sourceType = getImageSourceType(url);
   
   return {
-    unoptimized: sourceType !== 'local',
+    // Only use unoptimized for blob URLs and unknown sources
+    // Imgur and Postimages should work with Next.js optimization now
+    unoptimized: sourceType === 'blob' || sourceType === 'unknown',
     crossOrigin: needsCorsHandling(url) ? 'anonymous' as const : undefined,
     priority: true
   };
